@@ -19,7 +19,7 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("ny.json", function(error, ny) {
+d3.json("https://raw.githubusercontent.com/tlfrd/viz-blog/master/ny/ny.json", function(error, ny) {
   if (error) throw error;
 
   // group tracts by color for faster rendering
