@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
+<svg width="960" height="700"></svg>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
 <script>
 
-var width = 960,
-    height = 700;
+var svg = d3.select("svg"),
+  width = +svg.attr("width"),
+  height = +svg.attr("height");
 
 var path = d3.geo.path()
     .projection(null);
@@ -14,10 +16,6 @@ var path = d3.geo.path()
 var color = d3.scale.threshold()
     .domain([1, 10, 50, 100, 500, 1000, 2000, 5000])
     .range(["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"]);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
 
 d3.json("https://raw.githubusercontent.com/tlfrd/viz-blog/master/ny/ny.json", function(error, ny) {
   if (error) throw error;
