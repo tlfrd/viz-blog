@@ -164,7 +164,7 @@ state.append("text")
     .attr("dy", ".35em")
     .text(function(d) { return d.name; });
 
-var legend = d3.select('body')
+var legend = d3.select('svg')
 	.insert('div', ":first-child")
 	  .attr("id", "legend")
   .append('ul')
@@ -177,6 +177,8 @@ keys.enter().append('li')
     .attr('class', function(d) { console.log(d); return'key ' + d; })
     .style('border-top-color', String);
 
-loadResults();
+$( document ).ready(function() {
+    loadResults();
+});
 
 </script>
