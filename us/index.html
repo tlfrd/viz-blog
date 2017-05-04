@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script src="https://cdn.rawgit.com/tlfrd/viz-blog/master/grid/jenks.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 </head>
 <body>
@@ -21,8 +23,8 @@ var path = d3.geo.path()               // path generator that will convert GeoJS
 		  	 .projection(projection);  // tell path generator to use albersUsa projection
 
 // Define linear scale for output
-var color = d3.scale.linear()
-			  .range(["#fffafa","#ffd2c4","#ffa68e","#fc7657","#ef4123"]);
+// var color = d3.scale.linear()
+// 			  .range(["#fffafa","#ffd2c4","#ffa68e","#fc7657","#ef4123"]);
 
 //Create SVG element and append map to the SVG
 var svg = d3.select("body")
@@ -31,8 +33,11 @@ var svg = d3.select("body")
 			.attr("height", height);
 
 // Load in my states data!
-d3.csv("stateslived.csv", function(data) {
-color.domain([0,1,2,3]); // setting the range of the input data
+d3.csv("data.csv", function(data) {
+
+	var color = d3.scale.quantile()
+	      .domain(jenks(_.pluck(data, 'visited'), 4))
+	      .range(["#fffafa","#ffd2c4","#ffa68e","#fc7657","#ef4123"]);
 
 // Load GeoJSON data and merge with states data
 d3.json("us-states.json", function(json) {
