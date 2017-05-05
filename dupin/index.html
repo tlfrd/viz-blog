@@ -48,8 +48,8 @@ var path = d3.geo.path()
     .projection(projection);
 
 
-d3.json("france.json", function(error1, france) {
-  d3.csv("data.csv", function(error2, illiteracy) {
+d3.json("https://raw.githubusercontent.com/tlfrd/viz-collection/master/dupin/france.json", function(error1, france) {
+  d3.csv("https://raw.githubusercontent.com/tlfrd/viz-collection/master/dupin/data.csv", function(error2, illiteracy) {
 
     if (error1) throw error1;
     if (error2) throw error2;

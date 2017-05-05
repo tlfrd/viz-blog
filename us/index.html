@@ -33,7 +33,7 @@ var svg = d3.select("body")
 var color;
 
 // Load in my states data!
-d3.csv("data.csv", function(data) {
+d3.csv("https://raw.githubusercontent.com/tlfrd/viz-collection/master/us/data.csv", function(data) {
 
 	var modified_data = data;
 	for (var i = 0; i < data.length; i++) {
@@ -45,7 +45,7 @@ d3.csv("data.csv", function(data) {
 		      .range(["#fffafa","#ffd2c4","#ffa68e","#fc7657","#ef4123"]);
 
 	// Load GeoJSON data and merge with states data
-	d3.json("us-states.json", function(json) {
+	d3.json("https://raw.githubusercontent.com/tlfrd/viz-collection/master/us/us-states.json", function(json) {
 		// Loop through each state data value in the .csv file
 		for (var i = 0; i < data.length; i++) {
 			// Grab State Name
