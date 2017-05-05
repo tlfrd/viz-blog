@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<svg width="960" height="700"></svg>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+  width = +svg.attr("width"),
+  height = +svg.attr("height");
+
+var path = d3.geo.path()
+    .projection(null);
+
+var color = d3.scale.threshold()
+    .domain([1, 10, 50, 100, 500, 1000, 2000, 5000])
+    .range(['#f7f7f7','#d9d9d9','#bdbdbd','#969696','#737373','#525252','#252525']);
+
+d3.json("https://raw.githubusercontent.com/tlfrd/viz-blog/master/ny/ny.json", function(error, ny) {
+  if (error) throw error;
+
+  // group tracts by color for faster rendering
+  svg.append("g")
+      .attr("class", "tract")
+    .selectAll("path")
+      .data(d3.nest()
+        .key(function(d) { return color(d.properties.population / d.properties.area * 2.58999e6); }) // convert square meters to square miles
+        .entries(ny.objects.tracts.geometries))
+    .enter().append("path")
+      .style("fill", function(d) { return d.key; })
+      .attr("d", function(d) { return path(topojson.merge(ny, d.values)); });
+
+    loadResults();
+});
+
+d3.select(self.frameElement).style("height", height + "px");
+
+</script>

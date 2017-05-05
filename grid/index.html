@@ -60,7 +60,7 @@ CA UT CO NE MO KY WV VA MD DE
          OK LA MS AL GA
 HI AK    TX             FL
 </script>
-<script src="https://cdn.rawgit.com/tlfrd/viz-blog/master/grid/jenks.js"></script>
+<script src="https://cdn.rawgit.com/tlfrd/viz-collection/master/grid/jenks.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
@@ -177,7 +177,7 @@ keys.enter().append('li')
     .attr('class', function(d) { console.log(d); return'key ' + d; })
     .style('border-top-color', String);
 
-$( document ).ready(function() {
+$(document).ready(function() {
     loadResults();
 });
 
