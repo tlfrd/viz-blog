@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
 <style>
 
 .border{
@@ -16,7 +14,6 @@ svg {font: 10px sans-serif;}
 }
 
 </style>
-<body>
 <svg width="960" height="500"></svg>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
@@ -46,7 +43,6 @@ var projection = d3.geo.albers()
 
 var path = d3.geo.path()
     .projection(projection);
-
 
 d3.json("https://raw.githubusercontent.com/tlfrd/viz-collection/master/dupin/france.json", function(error1, france) {
   d3.csv("https://raw.githubusercontent.com/tlfrd/viz-collection/master/dupin/data.csv", function(error2, illiteracy) {
