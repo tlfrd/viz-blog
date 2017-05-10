@@ -12,7 +12,6 @@
 
   <style>
 
-
   #map {
     width: 600px;
   }
@@ -32,50 +31,6 @@
       stroke: #777;
       stroke-dasharray: 2,2;
       stroke-linejoin: round;
-  }
-
-
-  .Conservative {
-    fill: #0087DC;
-  }
-  .GreenParty {
-    fill: #6AB023;
-  }
-  .Independent {
-    fill: #996699;
-  }
-  .Labour {
-    fill: #DC241f;
-  }
-  .LabourCooperative {
-    fill: #CC0000;
-  }
-  .LiberalDemocrat {
-    fill: #FDBB30;
-  }
-  .PlaidCymru {
-    fill: #008142;
-  }
-  .ScottishNationalParty {
-    fill: #FFFF00;
-  }
-  .Speaker {
-    fill: #ffffff;
-  }
-  .UKIndependenceParty {
-    fill: #70147A;
-  }
-  .DemocraticUnionistParty {
-    fill: #D46A4C;
-  }
-  .SinnFin {
-    fill: #008800;
-  }
-  .SocialDemocraticLabourParty {
-    fill: #99FF66;
-  }
-  .UlsterUnionistParty {
-    fill: #9999FF;
   }
 
   </style>
@@ -251,9 +206,6 @@
                   max = p[key].population;
                 }
               }
-
-              console.log(min);
-              console.log(max);
 
               colour.domain([min, max])
                 .range(["#ffffd9", "#081d58"]);

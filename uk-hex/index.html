@@ -12,7 +12,6 @@
 
   <style>
 
-
   #map {
     width: 600px;
   }
@@ -34,50 +33,6 @@
       stroke-linejoin: round;
   }
 
-
-  .Conservative {
-    fill: #0087DC;
-  }
-  .GreenParty {
-    fill: #6AB023;
-  }
-  .Independent {
-    fill: #996699;
-  }
-  .Labour {
-    fill: #DC241f;
-  }
-  .LabourCooperative {
-    fill: #CC0000;
-  }
-  .LiberalDemocrat {
-    fill: #FDBB30;
-  }
-  .PlaidCymru {
-    fill: #008142;
-  }
-  .ScottishNationalParty {
-    fill: #FFFF00;
-  }
-  .Speaker {
-    fill: #ffffff;
-  }
-  .UKIndependenceParty {
-    fill: #70147A;
-  }
-  .DemocraticUnionistParty {
-    fill: #D46A4C;
-  }
-  .SinnFin {
-    fill: #008800;
-  }
-  .SocialDemocraticLabourParty {
-    fill: #99FF66;
-  }
-  .UlsterUnionistParty {
-    fill: #9999FF;
-  }
-
   </style>
 
   <body>
@@ -96,7 +51,9 @@
 
     // variables to draw map
     var projection, svg, path, g;
-    var boundaries, members;
+    var boundaries, population;
+
+    var colour = d3.scale.linear();
 
     // init map
     init(width, height);
@@ -203,14 +160,15 @@
     // colours map with party colour
     function colour_map() {
         var areas = d3.selectAll(".area");
-        areas.attr("class", function(d) {
-          return get_colour_class(d.properties.constituency);
+        areas.style("fill", function(d) {
+          return get_colour(d.properties.constituency);
         });
     }
 
     // gets party colour from id
-    function get_colour_class(id) {
-      return strip_whitespace(members[id].party);
+    function get_colour(id) {
+      var pc = population[id].population;
+      return colour(pc);
     }
 
     // strip whitespace from string
@@ -229,24 +187,40 @@
     }
 
     // loads data from the given file and redraws the map
-    function load_data(map_filename, mps_filename) {
+    function load_data(map_filename, population_filename) {
         // clear any selection
         deselect();
 
         var map = map_filename;
-        var mps = mps_filename;
+        var pop = population_filename;
 
         d3.json(map, function(error, b) {
-            d3.json(mps, function(error, m) {
+            d3.json(pop, function(error, p) {
               if (error) return console.error(error);
+
+              var min = 9999999;
+              var max = 0;
+
+              for (var key in p) {
+                if (p[key].population < min) {
+                  min = p[key].population;
+                }
+                if (p[key].population > max) {
+                  max = p[key].population;
+                }
+              }
+
+              colour.domain([min, max])
+                .range(["#ffffd9", "#081d58"]);
+
               boundaries = b;
-              members = m;
+              population = p;
               redraw();
             });
         });
     }
 
-    load_data("json/uk-hex.json", "json/mps.json");
+    load_data("json/uk-hex.json", "json/population_ons.json");
 
     </script>
   </body>
