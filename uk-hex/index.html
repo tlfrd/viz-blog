@@ -77,6 +77,15 @@
 
         // graphics go here
         g = svg.append("g");
+
+        // add a white rectangle as background to enable us to deselect a map selection
+        g.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", width)
+            .attr("height", height)
+            .style("fill", "#3690c0")
+            .on('click', deselect);
     }
 
     // create a HTML table to display any properties about the selected item
@@ -194,7 +203,7 @@
               }
 
               colour.domain([min, max])
-                .range(["#ffffd9", "#081d58"]);
+                .range(["#f7fcf5", "#00441b"]);
 
               boundaries = b;
               population = p;
