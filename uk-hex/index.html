@@ -12,10 +12,6 @@
 
   <style>
 
-  #map {
-    width: 600px;
-  }
-
   .area{
       fill: #C0C0C0;
       stroke: none;
@@ -36,7 +32,7 @@
   </style>
 
   <body>
-    <div id="map"></div>
+    <svg width="500" height="500"></svg>
 
     <section id="data_table">
     </section>
@@ -46,12 +42,16 @@
 
     <script>
 
-    var width = 500;
-    var height = 500;
+    var width;
+    var height;
 
     // variables to draw map
     var projection, svg, path, g;
     var boundaries, population;
+
+    svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
 
     var colour = d3.scale.linear();
 
@@ -74,11 +74,6 @@
 
         path = d3.geo.path()
             .projection(projection);
-
-        // create the svg element for drawing onto
-        svg = d3.select("#map").append("svg")
-            .attr("width", width)
-            .attr("height", height);
 
         // graphics go here
         g = svg.append("g");
@@ -178,9 +173,6 @@
 
     // called to redraw the map - removes map completely and starts from scratch
     function redraw() {
-
-        d3.select("svg").remove();
-
         init(width, height);
         draw(boundaries);
         colour_map();
@@ -216,11 +208,13 @@
               boundaries = b;
               population = p;
               redraw();
+
+              loadResults();
             });
         });
     }
 
-    load_data("json/uk-hex.json", "json/population_ons.json");
+    load_data("https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-hex/json/uk-hex.json", "https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-hex/json/population_ons.json");
 
     </script>
   </body>
