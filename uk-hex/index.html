@@ -37,7 +37,7 @@
     <section id="data_table">
     </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
 
     <script>
@@ -53,7 +53,7 @@
         width = +svg.attr("width"),
         height = +svg.attr("height");
 
-    var colour = d3.scale.linear();
+    var colour = d3.scaleLinear();
 
     // init map
     init(width, height);
@@ -69,10 +69,10 @@
     function init(width, height) {
 
         // pretty boring projection
-        projection = d3.geo.albers()
+        projection = d3.geoAlbers()
             .rotate([0, 0]);
 
-        path = d3.geo.path()
+        path = d3.geoPath()
             .projection(projection);
 
         // graphics go here
