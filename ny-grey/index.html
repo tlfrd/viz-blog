@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <body>
 <svg width="960" height="700"></svg>
-<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
 <script>
 
@@ -10,10 +10,10 @@ var svg = d3.select("svg"),
   width = +svg.attr("width"),
   height = +svg.attr("height");
 
-var path = d3.geo.path()
+var path = d3.geoPath()
     .projection(null);
 
-var color = d3.scale.threshold()
+var color = d3.scaleThreshold()
     .domain([1, 10, 50, 100, 500, 1000, 2000, 5000])
     .range(['#f7f7f7','#d9d9d9','#bdbdbd','#969696','#737373','#525252','#252525']);
 
