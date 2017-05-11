@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <style>
 
 .state rect {
@@ -49,7 +46,6 @@ li.q3-5 { color: #fc7657; }
 li.q4-5 { color: #ef4123; }
 
 </style>
-<body>
 <svg width="960" height="500"></svg>
 <script id="grid" type="text/plain">
                               ME
@@ -63,7 +59,7 @@ HI AK    TX             FL
 </script>
 <script src="https://cdn.rawgit.com/tlfrd/viz-collection/master/grid/jenks.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
-<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
 var states = [],
@@ -143,7 +139,7 @@ var gridWidth = d3.max(states, function(d) { return d.x; }) + 1,
     gridHeight = d3.max(states, function(d) { return d.y; }) + 1,
     cellSize = 40;
 
-var jenks5 = d3.scale.quantile()
+var jenks5 = d3.scaleQuantile()
       .domain(jenks(_.values(statesObj), 4))
       .range(d3.range(5).map(function(i) { return "q" + i + "-5"; }));
 
@@ -165,18 +161,6 @@ state.append("text")
     .attr("dy", ".35em")
     .text(function(d) { return d.name; });
 
-var legend = d3.select('svg')
-	.insert('div', ":first-child")
-	  .attr("id", "legend")
-  .append('ul')
-    .attr('class', 'list-inline');
-
-var keys = legend.selectAll('li.key')
-    .data(jenks5.range());
-
-keys.enter().append('li')
-    .attr('class', function(d) { console.log(d); return'key ' + d; })
-    .style('border-top-color', String);
 
 $(document).ready(function() {
     loadResults();
