@@ -1,7 +1,21 @@
+<!DOCTYPE html>
 <style>
 </style>
+<svg width="960" height="500"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
+
+var svg = d3.select("svg");
+var margin = {top: 20, right: 80, bottom: 30, left: 50};
+var width = svg.attr("width") - margin.left - margin.right;
+var height = svg.attr("height") - margin.top - margin.bottom;
+
+var g = svg.append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+var z = d3.scaleOrdinal(d3.schemeCategory10);
 
 var parseTime = d3.timeParse("%Y%B");
 
@@ -30,7 +44,42 @@ d3.json("collection.json", function(error, data) {
 
   nestedData = nestedData.sort(sortByKeyDateAscending);
 
+  // add total for each publisher
+  for (var i = 0; i < nestedData.length; i++) {
+    for (var j = 0; j < nestedData[i].values.length; j++) {
+      var publisherTotal = nestedData[i].values[j].values.length;
+      nestedData[i].values[j].total = publisherTotal;
+      nestedData[i].values[j].cumulativeTotal = publisherTotal;
+    }
+  }
+
+  // convert arrays into json
+  for (var i = 0; i < nestedData.length; i++) {
+    var jsonObj = {};
+    for (var j = 0; j < nestedData[i].values.length; j++) {
+      var newItem = {
+        'total': nestedData[i].values[j].total,
+        'cumulativeTotal': nestedData[i].values[j].cumulativeTotal
+      };
+      jsonObj[nestedData[i].values[j].key] = newItem;
+    }
+    nestedData[i].values = jsonObj;
+  }
+
+  // cumulative totals
+  for (var i = 1; i < nestedData.length; i++) {
+    for (var j in nestedData[i - 1].values) {
+      if (nestedData[i].values[j]) {
+        nestedData[i].values[j].cumulativeTotal = nestedData[i].values[j].total + nestedData[i - 1].values[j].cumulativeTotal;
+      } else {
+        nestedData[i].values[j] = nestedData[i - 1].values[j];
+        nestedData[i].values[j].total = 0;
+      }
+    }
+  }
+
   console.log(nestedData);
 });
 
 </script>
+</html>
