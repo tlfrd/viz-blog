@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <style>
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
 </style>
 <svg width="960" height="500"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -15,7 +20,15 @@ var g = svg.append("g")
 
 var x = d3.scaleTime().range([0, width]);
 var y = d3.scaleLinear().range([height, 0]);
-var z = d3.scaleOrdinal(d3.schemeCategory10);
+var z = d3.scaleOrdinal(d3.schemeCategory20);
+
+var line = d3.line()
+    .x(function(d) {
+      return x(new Date(d.date));
+    })
+    .y(function(d) {
+      return y(d.cumulativeTotal);
+    });
 
 var parseTime = d3.timeParse("%Y%B");
 
@@ -23,6 +36,9 @@ d3.json("collection.json", function(error, data) {
   for (var i = 0; i < data.length; i++) {
     var month = data[i]["Cover Date Month"];
     var year = data[i]["Cover Date Year"]
+    if (!month) {
+      month = "January";
+    }
     var yearMonth = year + month;
     delete data[i]["Cover Date Month"];
     delete data[i]["Cover Date Year"];
@@ -67,10 +83,17 @@ d3.json("collection.json", function(error, data) {
   }
 
   // cumulative totals
+
+  var highestValue = 0;
+
   for (var i = 1; i < nestedData.length; i++) {
     for (var j in nestedData[i - 1].values) {
       if (nestedData[i].values[j]) {
-        nestedData[i].values[j].cumulativeTotal = nestedData[i].values[j].total + nestedData[i - 1].values[j].cumulativeTotal;
+        var cumulativeTotal = nestedData[i].values[j].total + nestedData[i - 1].values[j].cumulativeTotal;
+        nestedData[i].values[j].cumulativeTotal = cumulativeTotal;
+        if (cumulativeTotal > highestValue) {
+          highestValue = cumulativeTotal;
+        }
       } else {
         nestedData[i].values[j] = nestedData[i - 1].values[j];
         nestedData[i].values[j].total = 0;
@@ -78,7 +101,84 @@ d3.json("collection.json", function(error, data) {
     }
   }
 
-  console.log(nestedData);
+  x.domain(d3.extent(nestedData, function(d) {
+    return new Date(d.key);
+  }));
+
+  y.domain([0, highestValue]);
+
+  var publishers = [];
+  // get domain of publishers
+  for (var i in nestedData[nestedData.length - 1].values) {
+    publishers.push(i);
+  }
+  z.domain(publishers);
+
+  // put in another nice format
+  var newData = [];
+  for (var i in publishers) {
+    var publisher = publishers[i];
+    var publisherObject = {
+      'id': publisher,
+      'values': []
+    };
+
+    for (var j in nestedData) {
+      if (nestedData[j].key) {
+        var totalObject = {
+          'date': nestedData[j].key
+        }
+
+        if (nestedData[j].values[publisher]) {
+          totalObject.total = nestedData[j].values[publisher].total;
+          totalObject.cumulativeTotal = nestedData[j].values[publisher].cumulativeTotal;
+        } else {
+          totalObject.total = 0;
+          totalObject.cumulativeTotal = 0;
+        }
+
+        publisherObject.values.push(totalObject);
+      }
+    }
+    newData.push(publisherObject);
+  }
+
+  console.log(newData);
+
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+    .append("text")
+      .attr("x", x.range()[1] * 0.96)
+      .attr("dy", "-0.5em")
+      .attr("fill", "#000")
+      .text("Date Published");
+
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("fill", "#000")
+      .text("Comics Owned");
+
+  var comics = g.selectAll(".comic")
+    .data(newData)
+    .enter().append("g")
+      .attr("class", "comic");
+
+  comics.append("path")
+    .attr("class", "line")
+    .attr("d", function(d) {
+      return line(d.values);
+    })
+    .attr("stroke", function(d) {
+      return z(d.id);
+    });
+
 });
 
 </script>
