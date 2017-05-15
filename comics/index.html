@@ -12,10 +12,25 @@ d3.json("collection.json", function(error, data) {
     var yearMonth = year + month;
     delete data[i]["Cover Date Month"];
     delete data[i]["Cover Date Year"];
-    data[i]["CoverDate"] = yearMonth;
+    data[i]["CoverDate"] = parseTime(yearMonth);
   }
 
-  console.log(data);
+  var nestedData = d3.nest()
+    .key(function(d) {
+      return d.CoverDate;
+    })
+    .key(function(d) {
+      return d.Publisher;
+    })
+    .entries(data);
+
+  function sortByKeyDateAscending(a, b) {
+    return new Date(a.key) - new Date(b.key);
+  }
+
+  nestedData = nestedData.sort(sortByKeyDateAscending);
+
+  console.log(nestedData);
 });
 
 </script>
