@@ -1,0 +1,21 @@
+<style>
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var parseTime = d3.timeParse("%Y%B");
+
+d3.json("collection.json", function(error, data) {
+  for (var i = 0; i < data.length; i++) {
+    var month = data[i]["Cover Date Month"];
+    var year = data[i]["Cover Date Year"]
+    var yearMonth = year + month;
+    delete data[i]["Cover Date Month"];
+    delete data[i]["Cover Date Year"];
+    data[i]["CoverDate"] = yearMonth;
+  }
+
+  console.log(data);
+});
+
+</script>
