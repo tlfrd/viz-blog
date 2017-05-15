@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <style>
+
 .line {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
 }
+
 </style>
 <svg width="960" height="500"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -31,6 +33,8 @@ var line = d3.line()
     });
 
 var parseTime = d3.timeParse("%Y%B");
+
+var startDate = new Date(parseTime("2010January"));
 
 d3.json("collection.json", function(error, data) {
   for (var i = 0; i < data.length; i++) {
@@ -101,9 +105,9 @@ d3.json("collection.json", function(error, data) {
     }
   }
 
-  x.domain(d3.extent(nestedData, function(d) {
+  x.domain([startDate, d3.max(nestedData, function(d) {
     return new Date(d.key);
-  }));
+  })]);
 
   y.domain([0, highestValue]);
 
@@ -124,7 +128,8 @@ d3.json("collection.json", function(error, data) {
     };
 
     for (var j in nestedData) {
-      if (nestedData[j].key) {
+      var date = nestedData[j].key;
+      if (date && (new Date(date) >= startDate)) {
         var totalObject = {
           'date': nestedData[j].key
         }
@@ -151,7 +156,7 @@ d3.json("collection.json", function(error, data) {
       .call(d3.axisBottom(x))
     .append("text")
       .attr("x", x.range()[1] * 0.96)
-      .attr("dy", "-0.5em")
+      .attr("dy", "-3em")
       .attr("fill", "#000")
       .text("Date Published");
 
@@ -163,7 +168,7 @@ d3.json("collection.json", function(error, data) {
       .attr("y", 6)
       .attr("dy", "0.71em")
       .attr("fill", "#000")
-      .text("Comics Owned");
+      .text("Comics Owned Per Publisher");
 
   var comics = g.selectAll(".comic")
     .data(newData)
@@ -175,9 +180,38 @@ d3.json("collection.json", function(error, data) {
     .attr("d", function(d) {
       return line(d.values);
     })
-    .attr("stroke", function(d) {
+    .style("stroke", function(d) {
       return z(d.id);
-    });
+    })
+    .style("opacity", 0.5)
+    .on("mouseover", function() {
+      d3.select(this).style("opacity", 1);
+    })
+    .on("mouseout", function() {
+      d3.select(this).style("opacity", 0.5);
+    })
+
+  comics.append("text")
+    .datum(function(d) {
+      return {id: d.id, value: d.values[d.values.length - 1]};
+    })
+    .attr("transform", function(d) {
+      return "translate(" + x(new Date(d.value.date)) + "," + y(d.value.cumulativeTotal) + ")";
+    })
+    .attr("x", 3)
+    .attr("dy", "0.35em")
+    .style("font", "10px sans-serif")
+    .style("opacity", function(d) {
+      if (d.value.cumulativeTotal < 50) {
+        return 0;
+      } else {
+        return 1;
+      }
+    })
+    .text(function(d) { return d.id; });
+
+
+
 
 });
 
