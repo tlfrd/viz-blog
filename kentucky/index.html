@@ -94,7 +94,7 @@ var loadVisualisation = function(callback) {
       .attr("y", -6)
       .text("Population per square mile");
 
-  d3.json("counties.json", function(error, ky) {
+  d3.json("https://raw.githubusercontent.com/tlfrd/viz-collection/master/kentucky/counties.json", function(error, ky) {
     if (error) throw error;
 
     var counties = topojson.feature(ky, ky.objects.counties);
