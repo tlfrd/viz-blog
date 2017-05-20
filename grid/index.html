@@ -62,6 +62,8 @@ HI AK    TX             FL
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
+var loadVisualisation = function(callback) {
+
 var states = [],
     statesObj = {
       "AK": 12,
@@ -162,8 +164,8 @@ state.append("text")
     .text(function(d) { return d.name; });
 
 
-$(document).ready(function() {
-    loadResults();
-});
+callback();
+
+};
 
 </script>
