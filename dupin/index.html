@@ -55,8 +55,8 @@ d3.json("https://raw.githubusercontent.com/tlfrd/viz-collection/master/dupin/fra
     .enter().append('path')
     .attr('class', 'departements')
     .attr('d', path)
-    .style('fill', (departement) => {
-      var paringData = illiteracy.filter((illiteracy) => {
+    .style('fill', function (departement) {
+      var paringData = illiteracy.filter(function (illiteracy) {
         return departement.properties.name === illiteracy.name;
       })[0];
 
