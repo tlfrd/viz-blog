@@ -8,7 +8,7 @@
 }
 
 </style>
-<svg width="960" height="500"></svg>
+<svg width="600" height="300"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
@@ -20,6 +20,20 @@ var height = svg.attr("height") - margin.top - margin.bottom;
 var g = svg.append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+function getLineColour(id) {
+  if (publisherColours[id]) {
+    return publisherColours[id];
+  } else {
+    return z(id);
+  }
+}
+
+var publisherColours = {
+  'DC Comics': '#0282f9',
+  'Marvel': '#f0141e',
+  'Image Comics': '#000000'
+}
+
 var x = d3.scaleTime().range([0, width]);
 var y = d3.scaleLinear().range([height, 0]);
 var z = d3.scaleOrdinal(d3.schemeCategory20);
@@ -30,13 +44,22 @@ var line = d3.line()
     })
     .y(function(d) {
       return y(d.cumulativeTotal);
-    });
+    })
+    .curve(d3.curveStepAfter);
 
 var parseTime = d3.timeParse("%Y%B");
 
 var startDate = new Date(parseTime("2010January"));
+var minimumForLabel = 50;
 
+function sortByKeyDateAscending(a, b) {
+  return new Date(a.key) - new Date(b.key);
+}
+
+// load collection data
 d3.json("collection.json", function(error, data) {
+
+  // convert date into new format
   for (var i = 0; i < data.length; i++) {
     var month = data[i]["Cover Date Month"];
     var year = data[i]["Cover Date Year"]
@@ -49,6 +72,7 @@ d3.json("collection.json", function(error, data) {
     data[i]["CoverDate"] = parseTime(yearMonth);
   }
 
+  // nest data by cover date and then publisher
   var nestedData = d3.nest()
     .key(function(d) {
       return d.CoverDate;
@@ -58,10 +82,7 @@ d3.json("collection.json", function(error, data) {
     })
     .entries(data);
 
-  function sortByKeyDateAscending(a, b) {
-    return new Date(a.key) - new Date(b.key);
-  }
-
+  // sort by date ascending
   nestedData = nestedData.sort(sortByKeyDateAscending);
 
   // add total for each publisher
@@ -86,8 +107,7 @@ d3.json("collection.json", function(error, data) {
     nestedData[i].values = jsonObj;
   }
 
-  // cumulative totals
-
+  // calculate cumulative totals
   var highestValue = 0;
 
   for (var i = 1; i < nestedData.length; i++) {
@@ -105,14 +125,16 @@ d3.json("collection.json", function(error, data) {
     }
   }
 
+  // set the domain of x using the start date and last date
   x.domain([startDate, d3.max(nestedData, function(d) {
     return new Date(d.key);
   })]);
 
+  // set the domain of y using 0 and highest cumulative total
   y.domain([0, highestValue]);
 
-  var publishers = [];
   // get domain of publishers
+  var publishers = [];
   for (var i in nestedData[nestedData.length - 1].values) {
     publishers.push(i);
   }
@@ -148,18 +170,21 @@ d3.json("collection.json", function(error, data) {
     newData.push(publisherObject);
   }
 
-  console.log(newData);
+  // console.log(newData);
 
+  // append x axis
   g.append("g")
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
     .append("text")
-      .attr("x", x.range()[1] * 0.96)
-      .attr("dy", "-3em")
+      .attr("x", x.range()[1])
+      .attr("dy", "-2em")
       .attr("fill", "#000")
+      .attr("text-anchor", "end")
       .text("Date Published");
 
+  // append y axis
   g.append("g")
       .attr("class", "axis axis--y")
       .call(d3.axisLeft(y))
@@ -168,29 +193,33 @@ d3.json("collection.json", function(error, data) {
       .attr("y", 6)
       .attr("dy", "0.71em")
       .attr("fill", "#000")
-      .text("Comics Owned Per Publisher");
+      .text("Comics Owned Per Publisher (Cumulative)");
 
+  // append comic data
   var comics = g.selectAll(".comic")
     .data(newData)
     .enter().append("g")
       .attr("class", "comic");
 
+  // for each publisher add a path
   comics.append("path")
     .attr("class", "line")
     .attr("d", function(d) {
       return line(d.values);
     })
     .style("stroke", function(d) {
-      return z(d.id);
+      return getLineColour(d.id);
     })
-    .style("opacity", 0.5)
-    .on("mouseover", function() {
-      d3.select(this).style("opacity", 1);
-    })
-    .on("mouseout", function() {
-      d3.select(this).style("opacity", 0.5);
-    })
+    .style("opacity", 1)
+    .style("padding", "5px")
+    // .on("mouseover", function() {
+    //   d3.select(this).style("opacity", 1);
+    // })
+    // .on("mouseout", function() {
+    //   d3.select(this).style("opacity", 0.5);
+    // })
 
+  // for each publisher add a label
   comics.append("text")
     .datum(function(d) {
       return {id: d.id, value: d.values[d.values.length - 1]};
@@ -198,20 +227,18 @@ d3.json("collection.json", function(error, data) {
     .attr("transform", function(d) {
       return "translate(" + x(new Date(d.value.date)) + "," + y(d.value.cumulativeTotal) + ")";
     })
-    .attr("x", 3)
-    .attr("dy", "0.35em")
+    .attr("x", 0)
+    .attr("dy", "-1em")
+    .attr("text-anchor", "end")
     .style("font", "10px sans-serif")
     .style("opacity", function(d) {
-      if (d.value.cumulativeTotal < 50) {
+      if (d.value.cumulativeTotal < minimumForLabel) {
         return 0;
       } else {
         return 1;
       }
     })
     .text(function(d) { return d.id; });
-
-
-
 
 });
 
