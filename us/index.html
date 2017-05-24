@@ -1,4 +1,4 @@
-<svg width="960" height="500"></svg>
+<svg width="600" height="400"></svg>
 <script src="https://cdn.rawgit.com/tlfrd/viz-collection/master/grid/jenks.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -7,8 +7,8 @@
 var loadVisualisation = function(callback) {
 
 	//Width and height of map
-	var width = 960;
-	var height = 500;
+	var width = 600;
+	var height = 400;
 
 	//Create SVG element and append map to the SVG
 	var svg = d3.select("svg")
@@ -18,7 +18,7 @@ var loadVisualisation = function(callback) {
 	// D3 Projection
 	var projection = d3.geoAlbersUsa()
 					   .translate([width/2, height/2]) 	// translate to center of screen
-					   .scale([1000]); 									// scale things down so see entire US
+					   .scale([700]); 									// scale things down so see entire US
 
 	// Define path generator
 	var path = d3.geoPath()               			// path generator that will convert GeoJSON to SVG paths

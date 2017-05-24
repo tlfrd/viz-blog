@@ -1,28 +1,38 @@
 <style>
 
-.border{
-  stroke-width:.3px;
-  fill:none;
-  stroke:#333;
+.border {
+  stroke-width: .3px;
+  fill: none;
+  stroke: #333;
 }
-svg {font: 10px sans-serif;}
-.caption{font-weight: bold;}
-.key path {display: none;}
-.key line{
-  stroke:#000;
-  shape-rendering:crispEdges;
+
+svg {
+  font: 10px sans-serif;
+}
+
+.caption {
+  font-weight: bold;
+}
+
+.key path {
+  display: none;
+}
+
+.key line {
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 </style>
-<svg width="960" height="500"></svg>
+<svg width="600" height="400"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
 <script>
 
 var loadVisualisation = function(callback) {
 
-  var width = 960;
-  var height = 500;
+  var width = 600;
+  var height = 400;
 
   var formatNumber = d3.format('s');
 
@@ -40,8 +50,8 @@ var loadVisualisation = function(callback) {
     .center([0, 49.5])
     .rotate([-2.8, 3])
     .parallels([45, 55])
-    .scale(2500)
-    .translate([width / 3, height / 2]);
+    .scale(2000)
+    .translate([width / 2, height / 2]);
 
   var path = d3.geoPath()
       .projection(projection);

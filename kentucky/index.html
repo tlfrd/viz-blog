@@ -32,15 +32,15 @@ svg {
 }
 
 </style>
-<svg width="960" height="500"></svg>
+<svg width="750" height="400"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
 <script>
 
 var loadVisualisation = function(callback) {
 
-  var w = 960;
-  var h = 500;
+  var w = 750;
+  var h = 400;
 
   var svg = d3.select("svg")
       .attr("width", w)
@@ -64,7 +64,7 @@ var loadVisualisation = function(callback) {
   var projection = d3.geoConicConformal()
       .rotate([85 + 45 / 60, -36 - 20 / 60])
       .parallels([37 + 05 / 60, 38 + 40 / 60])
-      .scale(7090)
+      .scale(5590)
       .center([-0.04940, 1.50406])
       .translate([w / 2, h / 2]);
 
