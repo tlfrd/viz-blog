@@ -1,0 +1,182 @@
+<style>
+
+  .area{
+      fill: #C0C0C0;
+      stroke: #777;
+      stroke-width: 0.1px;
+  }
+
+  .boundary {
+      fill: none;
+      /*stroke: #777;*/
+  }
+
+  .selected {
+      fill: #fff;
+      stroke: #777;
+      stroke-dasharray: 2,2;
+      stroke-linejoin: round;
+  }
+</style>
+
+<svg width="500" height="500"></svg>
+
+<section id="data_table">
+</section>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
+
+<script>
+
+
+var loadVisualisation = function(callback) {
+
+  var width;
+  var height;
+
+  var numberOfColours = 9;
+
+  // variables to draw map
+  var projection, svg, path, g;
+  var boundaries, population;
+
+  var colour = d3.scaleThreshold();
+  colour.range(d3.schemePurples[numberOfColours]);
+
+  svg = d3.select("svg"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height");
+
+  // init map
+  init(width, height);
+
+  function init(width, height) {
+
+      // pretty boring projection
+      projection = d3.geoAlbers()
+          .rotate([0, 0]);
+
+      path = d3.geoPath()
+          .projection(projection);
+
+      // graphics go here
+      g = svg.append("g");
+
+      // add a white rectangle as background to enable us to deselect a map selection
+      g.append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", width)
+          .attr("height", height)
+          .style("fill", "#FFFFFF");
+  }
+
+  // draw our map on the SVG element
+  function draw(boundaries) {
+
+      projection
+          .scale(1)
+          .translate([0,0]);
+
+      var zoomLevel = 4;
+      var xMove = 0;
+      // (x left)
+      var yMove = -80;
+      // (y up)
+
+      // compute the correct bounds and scaling from the topoJSON
+      var b = path.bounds(topojson.feature(boundaries, boundaries.objects["wpc"]));
+      var s = zoomLevel / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+      var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+      t[0] += (xMove * zoomLevel);
+      t[1] += (yMove * zoomLevel);
+
+      projection
+          .scale(s)
+          .translate(t);
+
+      // add an area for each feature in the topoJSON
+      g.selectAll(".area")
+          .data(topojson.feature(boundaries, boundaries.objects["wpc"]).features)
+          .enter().append("path")
+          .attr("class", "area")
+          .attr("id", function(d) {return d.id})
+          .attr("d", path);
+
+      // add a boundary between areas
+      g.append("path")
+          .datum(topojson.mesh(boundaries, boundaries.objects["wpc"], function(a, b){ return a !== b }))
+          .attr('d', path)
+          .attr('class', 'boundary');
+  }
+
+  // colours map with party colour
+  function colour_map() {
+      var areas = d3.selectAll(".area");
+      areas.style("fill", function(d) {
+        return get_colour(d.id);
+      });
+  }
+
+  // gets party colour from id
+  function get_colour(id) {
+    var pc = population[id].population;
+    return colour(pc);
+  }
+
+  // strip whitespace from string
+  function strip_whitespace(string) {
+    return string.replace(/[^a-zA-Z]/g, '');
+  }
+
+  // called to redraw the map - removes map completely and starts from scratch
+  function redraw() {
+      init(width, height);
+      draw(boundaries);
+      colour_map();
+  }
+
+  // loads data from the given file and redraws the map
+  function load_data(map_filename, pop_filename) {
+
+      var map = map_filename;
+      var pop = pop_filename;
+
+      d3.json(map, function(error, b) {
+          d3.json(pop, function(error, p) {
+            if (error) return console.error(error);
+
+            var min = 9999999;
+            var max = 0;
+
+            for (var key in p) {
+              if (p[key].population < min) {
+                min = p[key].population;
+              }
+              if (p[key].population > max) {
+                max = p[key].population;
+              }
+            }
+
+            colour.domain(d3.range(min, max, (max - min) / numberOfColours));
+
+            console.log(colour.domain());
+
+            boundaries = b;
+            population = p;
+            redraw();
+
+            callback();
+          });
+      });
+  }
+
+  load_data("https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-choro/json/uk.json", "https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-choro/json/population_ons.json");
+};
+
+loadVisualisation(function() {
+  console.log("Loaded!");
+});
+</script>
