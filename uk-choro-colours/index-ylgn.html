@@ -43,7 +43,7 @@ var loadVisualisation = function(callback) {
   var boundaries, population;
 
   var colour = d3.scaleThreshold();
-  colour.range(d3.schemePurples[numberOfColours]);
+  colour.range(d3.schemeYlGn[numberOfColours]);
 
   svg = d3.select("svg"),
       width = +svg.attr("width"),
